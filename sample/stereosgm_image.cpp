@@ -27,6 +27,7 @@ limitations under the License.
 static const std::string keys =
 "{ @left_img   | <none> | path to input left image                                                            }"
 "{ @right_img  | <none> | path to input right image                                                           }"
+"{ @output_dir  | <none> | path to output saved directory                                                           }"
 "{ disp_size   |     64 | maximum possible disparity value                                                    }"
 "{ P1          |     10 | penalty on the disparity change by plus or minus 1 between nieghbor pixels          }"
 "{ P2          |    120 | penalty on the disparity change by more than 1 between neighbor pixels              }"
@@ -56,7 +57,19 @@ int main(int argc, char* argv[])
 	const int min_disp = parser.get<int>("min_disp");
 	const int LR_max_diff = parser.get<int>("LR_max_diff");
 	const auto census_type = static_cast<sgm::CensusType>(parser.get<int>("census_type"));
-
+	cv::String output_dir = parser.get<cv::String>("@output_dir");
+	std::string path = parser.get<cv::String>("@left_img");
+	// Find the last occurrence of '/'
+    std::size_t pos = path.find_last_of('/');
+	std::string file_name = "image.png";
+    if (pos == std::string::npos) {
+        // No '/' found, the entire string is the last item
+        std::cout << path << std::endl;
+    } else {
+        // Substring from one after '/' till the end
+        file_name = path.substr(pos + 1);
+        std::cout << file_name << std::endl;
+    }
 	if (!parser.check()) {
 		parser.printErrors();
 		parser.printMessage();
@@ -96,22 +109,10 @@ int main(int argc, char* argv[])
 	const std::vector<cv::Mat> images = { disparity_8u, disparity_color, I1 };
 	const std::vector<std::string> titles = { "disparity", "disparity color", "input" };
 
-	std::cout << "Hot keys:" << std::endl;
-	std::cout << "\tESC - quit the program" << std::endl;
-	std::cout << "\ts - switch display (disparity | colored disparity | input image)" << std::endl;
-
 	int mode = 0;
-	while (true) {
-
-		cv::setWindowTitle("image", titles[mode]);
-		cv::imshow("image", images[mode]);
-
-		const char c = cv::waitKey(0);
-		if (c == 's')
-			mode = (mode < 2 ? mode + 1 : 0);
-		if (c == 27)
-			break;
-	}
+	// Combine them with a '/' separator
+    std::string full_path = output_dir + "/" + file_name;
+	cv::imwrite(full_path, images[mode]);
 
 	return 0;
 }
