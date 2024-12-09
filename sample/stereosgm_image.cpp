@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	cv::Mat I1 = cv::imread(parser.get<cv::String>("@left_img"), cv::IMREAD_UNCHANGED);
-	cv::Mat I2 = cv::imread(parser.get<cv::String>("@right_img"), cv::IMREAD_UNCHANGED);
+	cv::Mat I1 = cv::imread(parser.get<cv::String>("@left_img"), cv::IMREAD_GRAYSCALE);
+	cv::Mat I2 = cv::imread(parser.get<cv::String>("@right_img"), cv::IMREAD_GRAYSCALE);
 
 	const int disp_size = parser.get<int>("disp_size");
 	const int P1 = parser.get<int>("P1");
